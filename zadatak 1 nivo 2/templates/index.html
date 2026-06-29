@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="sr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Interceptor kesiranja</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page">
+        <section class="panel">
+            <div class="heading">
+                <h1>Interceptor kesiranja</h1>
+                <span>{{ cache_size }} rezultata u kesu</span>
+            </div>
+
+            <form method="post" class="form">
+                <label for="number">Argument funkcije</label>
+                <div class="input-row">
+                    <input
+                        id="number"
+                        name="number"
+                        type="number"
+                        step="1"
+                        value="{{ number }}"
+                        required
+                    >
+                    <button type="submit">Pozovi funkciju</button>
+                </div>
+            </form>
+
+            <form method="post" action="{{ url_for('clear_cache') }}">
+                <button class="secondary" type="submit">Obrisi kes</button>
+            </form>
+
+            {% if error %}
+                <p class="message">{{ error }}</p>
+            {% endif %}
+
+            {% if result is not none %}
+                <section class="result">
+                    <h2>Rezultat</h2>
+                    <p>expensive_square({{ number }}) = <strong>{{ result }}</strong></p>
+                    <span class="{{ 'hit' if last_call and last_call.source == 'Kes' else 'miss' }}">
+                        {{ last_call.source }}
+                    </span>
+                </section>
+            {% endif %}
+
+            <section class="cache-list">
+                <h2>Trenutni kes</h2>
+                {% if cache_items %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Argument</th>
+                                <th>Rezultat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, value in cache_items %}
+                                <tr>
+                                    <td>{{ key[1][0] }}</td>
+                                    <td>{{ value }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="empty">Kes je trenutno prazan.</p>
+                {% endif %}
+            </section>
+        </section>
+    </main>
+</body>
+</html>

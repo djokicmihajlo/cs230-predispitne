@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="sr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SHA-256 enkripcija teksta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page">
+        <section class="panel">
+            <h1>SHA-256 enkripcija teksta</h1>
+
+            <form method="post" id="hashForm" novalidate>
+                <label for="text">Unesite tekst</label>
+                <textarea
+                    id="text"
+                    name="text"
+                    rows="6"
+                    maxlength="{{ max_text_length }}"
+                    required
+                >{{ text }}</textarea>
+
+                <div class="form-footer">
+                    <p id="message" class="message" role="alert">
+                        {% if error %}{{ error }}{% endif %}
+                    </p>
+                    <span id="counter">{{ text|length }}/{{ max_text_length }}</span>
+                </div>
+
+                <button type="submit">Enkriptuj</button>
+            </form>
+
+            {% if hashed_text %}
+                <section class="result" aria-label="SHA-256 rezultat">
+                    <h2>SHA-256 hash</h2>
+                    <p>{{ hashed_text }}</p>
+                </section>
+            {% endif %}
+        </section>
+    </main>
+
+    <script>
+        const textInput = document.getElementById('text');
+        const form = document.getElementById('hashForm');
+        const counter = document.getElementById('counter');
+        const message = document.getElementById('message');
+        const maxLength = {{ max_text_length }};
+
+        function updateCounter() {
+            counter.textContent = `${textInput.value.length}/${maxLength}`;
+            message.textContent = textInput.value.length > maxLength
+                ? 'Tekst ne sme imati vise od 255 karaktera.'
+                : '';
+        }
+
+        textInput.addEventListener('input', updateCounter);
+        form.addEventListener('submit', (event) => {
+            if (textInput.value.length === 0 || textInput.value.length > maxLength) {
+                event.preventDefault();
+                message.textContent = textInput.value.length === 0
+                    ? 'Unesite tekst pre slanja.'
+                    : 'Tekst ne sme imati vise od 255 karaktera.';
+            }
+        });
+        updateCounter();
+    </script>
+</body>
+</html>
